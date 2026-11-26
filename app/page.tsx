@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
-  const { data } = await db()
+  const { data, error: dbError } = await db()
     .from("classes")
     .select("id, name, status")
     .in("status", ["signup", "ranking"])
@@ -20,6 +20,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ e
         you&apos;ll use that link to rank the groups that work for you, and you&apos;ll be placed right away.
       </p>
       {error && <p className="notice bad" role="alert">{error}</p>}
+      {dbError && (
+        <p className="notice bad" role="alert">
+          The site can&apos;t reach the database ({dbError.message}). Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel.
+        </p>
+      )}
       {classes.length === 0 ? (
         <p className="box">No classes are open for sign-up right now. Check back soon.</p>
       ) : (
